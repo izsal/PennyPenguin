@@ -1,0 +1,37 @@
+# Android Studio
+*.iml
+.gradle/
+.idea/caches/
+.idea/libraries/
+.idea/modules.xml
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+
+# Kotlin
+.kotlin/
+
+# Build
+build/
+**/build/
+
+# Native
+.externalNativeBuild/
+.cxx/
+
+# Local configuration
+local.properties
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
+
+# Secrets
+keystore.properties
+secrets.properties
+
+# Signing
+*.jks
+*.keystore
