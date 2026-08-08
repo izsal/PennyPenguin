@@ -1,0 +1,12 @@
+- `[x]` Data Layer: Increment `AppDatabase` version to 2
+- `[x]` Data Layer: Enable `fallbackToDestructiveMigration` in `DatabaseModule`
+- `[x]` Navigation: Add `Categories` route to `Screen.kt`
+- `[x]` Presentation: Add "Category" menu to `ProfileScreen.kt`
+- `[x]` Presentation: Implement `CategoryListScreen` and `CategoryListViewModel`
+- `[x]` Presentation: Update `MainScreen.kt` with new routes
+- `[x]` Presentation: Remove "Add Custom" shortcut from `AddEditTransactionScreen`
+- `[x]` Presentation: Implement Edit and Delete for Categories
+    - `[x]` Update `Screen.kt` for navigation parameters
+    - `[x]` Update `MainScreen.kt` to pass `categoryId` to `AddCategoryScreen`
+    - `[x]` Update `AddCategoryViewModel` to support editing
+    - `[x]` Add Edit button to `CategoryListScreen`

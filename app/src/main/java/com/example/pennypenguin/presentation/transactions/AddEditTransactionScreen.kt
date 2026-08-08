@@ -1,19 +1,25 @@
 package com.example.pennypenguin.presentation.transactions
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.pennypenguin.domain.model.Category
 import com.example.pennypenguin.domain.model.TransactionType
 import kotlinx.coroutines.flow.collectLatest
 
@@ -27,6 +33,10 @@ fun AddEditTransactionScreen(
     val note by viewModel.note.collectAsState()
     val type by viewModel.type.collectAsState()
     val category by viewModel.category.collectAsState()
+    val categories by viewModel.categories.collectAsState()
+
+    var showCategoryPicker by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState()
 
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->
@@ -34,6 +44,48 @@ fun AddEditTransactionScreen(
                 is AddEditTransactionViewModel.UiEvent.SaveTransaction -> {
                     onPopBackStack()
                 }
+            }
+        }
+    }
+
+    if (showCategoryPicker) {
+        ModalBottomSheet(
+            onDismissRequest = { showCategoryPicker = false },
+            sheetState = sheetState
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .navigationBarsPadding()
+            ) {
+                Text(
+                    text = "Select Category",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+                
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(4),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.heightIn(max = 400.dp)
+                ) {
+                    items(categories) { item ->
+                        CategoryItem(
+                            category = item,
+                            isSelected = item.id == category.id,
+                            onClick = {
+                                viewModel.onCategoryChange(item)
+                                showCategoryPicker = false
+                            }
+                        )
+                    }
+                }
+                
+                Spacer(modifier = Modifier.height(24.dp))
+                // Removed Add Custom Category button from here as requested
             }
         }
     }
@@ -96,13 +148,44 @@ fun AddEditTransactionScreen(
             )
 
             Text("Category", style = MaterialTheme.typography.titleLarge)
-            // For simplicity, a text displaying selected category. 
-            // In a real app, this would be a grid or dropdown.
+            
             AssistChip(
-                onClick = { /* Open Category Picker */ },
+                onClick = { showCategoryPicker = true },
                 label = { Text(category.name) },
-                leadingIcon = { Text("🏷️") }
+                leadingIcon = { Text(category.icon) }
             )
         }
+    }
+}
+
+@Composable
+fun CategoryItem(
+    category: Category,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Surface(
+            modifier = Modifier.size(48.dp),
+            shape = MaterialTheme.shapes.medium,
+            color = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Text(text = category.icon, fontSize = 24.sp)
+            }
+        }
+        Text(
+            text = category.name,
+            style = MaterialTheme.typography.labelSmall,
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            modifier = Modifier.padding(top = 4.dp)
+        )
     }
 }

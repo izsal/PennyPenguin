@@ -32,4 +32,15 @@ interface TransactionDao {
 
     @Query("SELECT SUM(amount) FROM transactions WHERE type = 'EXPENSE' AND date BETWEEN :start AND :end")
     fun getExpenseByRange(start: LocalDateTime, end: LocalDateTime): Flow<Double?>
+
+    @Query("SELECT categoryId, categoryName, categoryIcon, type, SUM(amount) as totalAmount FROM transactions WHERE date BETWEEN :start AND :end GROUP BY categoryId")
+    fun getCategorySummaries(start: LocalDateTime, end: LocalDateTime): Flow<List<CategorySummaryEntity>>
 }
+
+data class CategorySummaryEntity(
+    val categoryId: String,
+    val categoryName: String,
+    val categoryIcon: String,
+    val type: com.example.pennypenguin.domain.model.TransactionType,
+    val totalAmount: Double
+)

@@ -15,12 +15,17 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import androidx.navigation.NavType
 import com.example.pennypenguin.navigation.Screen
 import com.example.pennypenguin.presentation.auth.AuthScreen
 import com.example.pennypenguin.presentation.auth.AuthViewModel
+import com.example.pennypenguin.presentation.categories.AddCategoryScreen
+import com.example.pennypenguin.presentation.categories.CategoryListScreen
 import com.example.pennypenguin.presentation.dashboard.DashboardScreen
 import com.example.pennypenguin.presentation.profile.PrivacyPolicyScreen
 import com.example.pennypenguin.presentation.profile.ProfileScreen
+import com.example.pennypenguin.presentation.reports.CategoryReportsScreen
 import com.example.pennypenguin.presentation.reports.ReportsScreen
 import com.example.pennypenguin.presentation.transactions.AddEditTransactionScreen
 import com.example.pennypenguin.presentation.transactions.TransactionListScreen
@@ -114,11 +119,26 @@ fun MainScreen(
                 TransactionListScreen()
             }
             composable(Screen.Reports.route) {
-                ReportsScreen()
+                ReportsScreen(
+                    onSeeCategoryReportsClick = { navController.navigate(Screen.CategoryReports.route) }
+                )
+            }
+            composable(Screen.CategoryReports.route) {
+                CategoryReportsScreen(
+                    onPopBackStack = { navController.popBackStack() }
+                )
             }
             composable(Screen.Profile.route) {
                 ProfileScreen(
-                    onPrivacyPolicyClick = { navController.navigate(Screen.PrivacyPolicy.route) }
+                    onPrivacyPolicyClick = { navController.navigate(Screen.PrivacyPolicy.route) },
+                    onCategoriesClick = { navController.navigate(Screen.Categories.route) }
+                )
+            }
+            composable(Screen.Categories.route) {
+                CategoryListScreen(
+                    onBackClick = { navController.popBackStack() },
+                    onAddCategoryClick = { navController.navigate("add_category") },
+                    onEditCategoryClick = { id -> navController.navigate("add_category?categoryId=$id") }
                 )
             }
             composable(Screen.PrivacyPolicy.route) {
@@ -128,6 +148,20 @@ fun MainScreen(
             }
             composable(Screen.AddEditTransaction.route) {
                 AddEditTransactionScreen(
+                    onPopBackStack = { navController.popBackStack() }
+                )
+            }
+            composable(
+                route = Screen.AddCategory.route,
+                arguments = listOf(
+                    navArgument("categoryId") {
+                        type = NavType.StringType
+                        nullable = true
+                        defaultValue = null
+                    }
+                )
+            ) {
+                AddCategoryScreen(
                     onPopBackStack = { navController.popBackStack() }
                 )
             }

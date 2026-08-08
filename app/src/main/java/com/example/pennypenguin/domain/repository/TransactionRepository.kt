@@ -1,5 +1,6 @@
 package com.example.pennypenguin.domain.repository
 
+import com.example.pennypenguin.domain.model.CategorySummary
 import com.example.pennypenguin.domain.model.Transaction
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDateTime
@@ -22,4 +23,6 @@ interface TransactionRepository {
     fun getMonthlyIncome(month: Int, year: Int): Flow<Double>
     
     fun getMonthlyExpense(month: Int, year: Int): Flow<Double>
+
+    fun getCategorySummaries(month: Int, year: Int): Flow<List<CategorySummary>>
 }

@@ -20,6 +20,7 @@ import com.example.pennypenguin.util.Localization
 @Composable
 fun ProfileScreen(
     onPrivacyPolicyClick: () -> Unit,
+    onCategoriesClick: () -> Unit,
     themeViewModel: ThemeViewModel = hiltViewModel(),
     languageViewModel: LanguageViewModel = hiltViewModel()
 ) {
@@ -91,6 +92,36 @@ fun ProfileScreen(
                         }
                     }
                 )
+            }
+
+            item {
+                HorizontalDivider()
+            }
+
+            item {
+                Text(
+                    text = "Management",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+
+            item {
+                Surface(
+                    onClick = onCategoriesClick,
+                    shape = MaterialTheme.shapes.medium,
+                    color = MaterialTheme.colorScheme.surface
+                ) {
+                    ListItem(
+                        headlineContent = { Text("Categories") },
+                        leadingContent = {
+                            Icon(Icons.Default.Category, contentDescription = null)
+                        },
+                        trailingContent = {
+                            Icon(Icons.Default.ChevronRight, contentDescription = null)
+                        }
+                    )
+                }
             }
 
             item {

@@ -15,6 +15,9 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector?
     data object Reports : Screen("reports", "Reports", Icons.Default.PieChart)
     data object Profile : Screen("profile", "Profile", Icons.Default.AccountCircle)
     data object AddEditTransaction : Screen("add_edit_transaction", "Add Transaction", Icons.Default.Add)
+    data object Categories : Screen("categories", "Categories")
+    data object AddCategory : Screen("add_category?categoryId={categoryId}", "Add Category")
+    data object CategoryReports : Screen("category_reports", "Category Reports")
     data object Paywall : Screen("paywall", "Premium")
     data object PrivacyPolicy : Screen("privacy_policy", "Privacy Policy")
 

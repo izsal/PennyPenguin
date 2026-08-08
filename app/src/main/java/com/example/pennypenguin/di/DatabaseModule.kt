@@ -3,6 +3,7 @@ package com.example.pennypenguin.di
 import android.content.Context
 import androidx.room.Room
 import com.example.pennypenguin.data.local.AppDatabase
+import com.example.pennypenguin.data.local.CategoryDao
 import com.example.pennypenguin.data.local.TransactionDao
 import dagger.Module
 import dagger.Provides
@@ -22,11 +23,17 @@ object DatabaseModule {
             context,
             AppDatabase::class.java,
             AppDatabase.DATABASE_NAME
-        ).build()
+        ).fallbackToDestructiveMigration()
+            .build()
     }
 
     @Provides
     fun provideTransactionDao(database: AppDatabase): TransactionDao {
         return database.transactionDao
+    }
+
+    @Provides
+    fun provideCategoryDao(database: AppDatabase): CategoryDao {
+        return database.categoryDao
     }
 }

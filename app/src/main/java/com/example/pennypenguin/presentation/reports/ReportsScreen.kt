@@ -24,6 +24,7 @@ import com.example.pennypenguin.util.Localization
 
 @Composable
 fun ReportsScreen(
+    onSeeCategoryReportsClick: () -> Unit,
     viewModel: ReportsViewModel = hiltViewModel(),
     languageViewModel: LanguageViewModel = hiltViewModel()
 ) {
@@ -42,12 +43,21 @@ fun ReportsScreen(
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             item {
-                Text(
-                    text = Localization.getString("reports", lang),
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = Localization.getString("reports", lang),
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold
+                    )
+                    TextButton(onClick = onSeeCategoryReportsClick) {
+                        Text("Category Breakdown")
+                    }
+                }
             }
 
             item {

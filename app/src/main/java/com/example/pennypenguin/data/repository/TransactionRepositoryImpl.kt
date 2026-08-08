@@ -3,6 +3,7 @@ package com.example.pennypenguin.data.repository
 import com.example.pennypenguin.data.local.TransactionDao
 import com.example.pennypenguin.data.local.toDomain
 import com.example.pennypenguin.data.local.toEntity
+import com.example.pennypenguin.domain.model.CategorySummary
 import com.example.pennypenguin.domain.model.Transaction
 import com.example.pennypenguin.domain.repository.TransactionRepository
 import kotlinx.coroutines.flow.Flow
@@ -57,5 +58,21 @@ class TransactionRepositoryImpl @Inject constructor(
         val start = LocalDateTime.of(year, month, 1, 0, 0)
         val end = start.plusMonths(1).minusNanos(1)
         return dao.getExpenseByRange(start, end).map { it ?: 0.0 }
+    }
+
+    override fun getCategorySummaries(month: Int, year: Int): Flow<List<CategorySummary>> {
+        val start = LocalDateTime.of(year, month, 1, 0, 0)
+        val end = start.plusMonths(1).minusNanos(1)
+        return dao.getCategorySummaries(start, end).map { entities ->
+            entities.map {
+                CategorySummary(
+                    categoryId = it.categoryId,
+                    categoryName = it.categoryName,
+                    categoryIcon = it.categoryIcon,
+                    type = it.type,
+                    totalAmount = it.totalAmount
+                )
+            }
+        }
     }
 }
