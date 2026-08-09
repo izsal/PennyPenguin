@@ -29,6 +29,9 @@ class AddEditWalletViewModel @Inject constructor(
     private val _icon = MutableStateFlow("💳")
     val icon = _icon.asStateFlow()
 
+    private val _backgroundImageUri = MutableStateFlow<String?>(null)
+    val backgroundImageUri = _backgroundImageUri.asStateFlow()
+
     init {
         walletId?.let { id ->
             viewModelScope.launch {
@@ -36,6 +39,7 @@ class AddEditWalletViewModel @Inject constructor(
                     _name.value = wallet.name
                     _balance.value = wallet.balance.toInt().toString()
                     _icon.value = wallet.icon
+                    _backgroundImageUri.value = wallet.backgroundImageUri
                 }
             }
         }
@@ -53,6 +57,10 @@ class AddEditWalletViewModel @Inject constructor(
         _icon.value = value
     }
 
+    fun onBackgroundImageChange(uri: String?) {
+        _backgroundImageUri.value = uri
+    }
+
     fun saveWallet(onSuccess: () -> Unit) {
         if (_name.value.isBlank()) return
         val balanceValue = _balance.value.toDoubleOrNull() ?: 0.0
@@ -62,7 +70,8 @@ class AddEditWalletViewModel @Inject constructor(
                 id = walletId ?: 0,
                 name = _name.value,
                 balance = balanceValue,
-                icon = _icon.value
+                icon = _icon.value,
+                backgroundImageUri = _backgroundImageUri.value
             )
             if (isEditing) {
                 repository.updateWallet(wallet)

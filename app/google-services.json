@@ -13,7 +13,12 @@
           "package_name": "com.GaWe"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "391534480315-t5kv2lsafhqo2mnmlq8t2gbccbc1dca5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAwROyUK-mRNcwYVF5QILqzU5lujXoxIbo"
@@ -21,7 +26,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "391534480315-t5kv2lsafhqo2mnmlq8t2gbccbc1dca5.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "391534480315-fdkemp939ueevg5avr9re32s88pnnoie.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.GaWe"
+              }
+            }
+          ]
         }
       }
     },
@@ -32,7 +49,20 @@
           "package_name": "com.example.pennypenguin"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "391534480315-93mpf9je51d3ig3jh4spv1ls9b3a4f1j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.pennypenguin",
+            "certificate_hash": "9ed2b9b8c9f79dfe1230907ac0826c6b49d42d32"
+          }
+        },
+        {
+          "client_id": "391534480315-t5kv2lsafhqo2mnmlq8t2gbccbc1dca5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAwROyUK-mRNcwYVF5QILqzU5lujXoxIbo"
@@ -40,7 +70,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "391534480315-t5kv2lsafhqo2mnmlq8t2gbccbc1dca5.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "391534480315-fdkemp939ueevg5avr9re32s88pnnoie.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.GaWe"
+              }
+            }
+          ]
         }
       }
     }

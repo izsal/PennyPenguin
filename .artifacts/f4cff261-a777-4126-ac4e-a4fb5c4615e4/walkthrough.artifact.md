@@ -1,43 +1,37 @@
-# Walkthrough - Multiple Wallets (Dompet Ganda)
+# Walkthrough - Google Sign-In with Firebase
 
-I have successfully implemented the **Multiple Wallets** feature, allowing you to manage your money across different accounts like Cash, Bank, and E-Wallets.
+I have successfully implemented Google Sign-In using Firebase Authentication and the modern Android Credential Manager API.
 
 ## Changes Made
 
-### Data Layer
-- **Wallet Persistence**: Created `WalletEntity` and `WalletDao` to store account information and balances.
-- **Transaction Linking**: Updated `TransactionEntity` to include `walletId` and `walletName`, ensuring every record is tied to a specific wallet.
-- **Database Migration**: Incremented `AppDatabase` to version 4.
-  > [!WARNING]
-  > This update cleared existing data to establish the new wallet-transaction relationship correctly.
+### Configuration
+- **Dependencies**: Added `androidx.credentials` and `googleid` libraries to handle the secure sign-in flow.
+- **Web Client ID**: Integrated your Firebase Web Client ID (`...dca5.apps.googleusercontent.com`) into the app's authentication request.
 
-### Domain Layer
-- **Wallet Model**: Added `Wallet` domain model.
-- **Wallet Repository**: Implemented CRUD operations and balance update logic.
-- **Balance Logic**: Updated `GetBalanceUseCase` to calculate the total balance as the sum of all wallet balances.
+### Data Layer
+- **Firebase Integration**: Updated `AuthRepositoryImpl` to use `FirebaseAuth`.
+- **Session Management**: The app now listens to Firebase authentication state changes. If you are logged in, you'll be directed straight to the Dashboard.
+- **Sign-In Logic**: Implemented `signInWithCredential` to exchange the Google ID Token for a Firebase user session.
 
 ### User Interface
-- **Wallet Management**: Added a new **Wallets** screen accessible from the Profile menu. You can add, edit, and delete wallets here.
-- **Wallet Selection**: When adding a transaction, you can now select which wallet to use. The wallet's balance will automatically update based on the transaction (Income increases, Expense decreases).
-- **Dashboard Updates**:
-    - Shows a scrollable list of your wallets and their individual balances.
-    - The main balance card now displays the total sum of all your wallets.
-- **Transaction History**: Each transaction item now displays the name of the wallet used.
+- **Auth Screen**: Updated the "Sign in with Google" button to trigger the native Android account picker using the Credential Manager.
+- **Navigation**: Cleaned up the navigation logic to handle automatic redirection based on the authentication state.
 
 ## How to Test
 
-1. **Create Wallets**:
-   - Go to **Profile > Wallets**.
-   - Tap **+** and create "Cash" with an initial balance (e.g., `500.000`).
-   - Create another wallet "Bank BCA" (e.g., `2.000.000`).
-2. **Add a Transaction**:
-   - Go to **Dashboard** or **Transactions** and tap **+**.
-   - Select "Bank BCA" as the wallet.
-   - Add an expense (e.g., `100.000`).
-3. **Verify Balance**:
-   - Return to the **Dashboard**.
-   - You should see "Bank BCA" balance decreased to `1.900.000`.
-   - The total balance should be `2.400.000` (Cash + Bank BCA).
-4. **Delete Transaction**:
-   - Delete the transaction from the **Transactions** list.
-   - Verify the wallet balance reverts back to its previous state.
+1. **Launch the App**:
+   - Navigate to the **Auth Screen**.
+2. **Sign In**:
+   - Tap **Sign in with Google**.
+   - A system dialog should appear listing your Google accounts.
+   - Select an account.
+3. **Verify**:
+   - Upon successful selection, the app should automatically navigate to the **Dashboard**.
+
+> [!IMPORTANT]
+> **Checklist for Success:**
+> 1.  **Firebase Console**: Ensure **Google** is enabled as a sign-in provider.
+> 2.  **SHA-1**: Ensure your computer's **SHA-1 fingerprint** is added to the Firebase Project Settings.
+> 3.  **google-services.json**: Ensure the file you added is the latest version from the Firebase Console.
+
+If you encounter a "Developer Error" (12500) during sign-in, it almost always means the **SHA-1 fingerprint** is missing or incorrect in the Firebase Console.

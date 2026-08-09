@@ -1,51 +1,54 @@
-# Implementation Plan - Multiple Wallets (Dompet Ganda)
+# Implementation Plan - Google Sign-In with Firebase
 
-The goal is to allow users to manage money across multiple accounts (e.g., Cash, Bank, E-Wallet). This is a core premium feature that provides better financial clarity.
-
-## User Review Required
-
-> [!IMPORTANT]
-> This change requires a database migration to version 4. I will enable destructive migration, which will reset your data once more to ensure the new wallet relationships are correctly established.
+The goal is to implement Google Sign-In using Firebase Authentication and the modern Android Credential Manager API.
 
 ## Proposed Changes
 
-### Data & Domain Layer
+### Configuration
 
-#### [NEW] [WalletEntity.kt](file:///Users/qwarts/AndroidStudioProjects/PennyPenguin/app/src/main/java/com/example/pennypenguin/data/local/WalletEntity.kt)
-- Define Room entity for `Wallet` (id, name, balance, icon).
+#### [MODIFY] [libs.versions.toml](file:///Users/qwarts/AndroidStudioProjects/PennyPenguin/gradle/libs.versions.toml)
+- Add versions for `credentials` and `googleid`.
+- Add libraries: `androidx-credentials`, `androidx-credentials-play-services-auth`, and `googleid`.
 
-#### [MODIFY] [TransactionEntity.kt](file:///Users/qwarts/AndroidStudioProjects/PennyPenguin/app/src/main/java/com/example/pennypenguin/data/local/TransactionEntity.kt)
-- Add `walletId` and `walletName` to link transactions to a specific wallet.
+#### [MODIFY] [build.gradle.kts](file:///Users/qwarts/AndroidStudioProjects/PennyPenguin/app/build.gradle.kts)
+- Add the new dependencies to the `dependencies` block.
 
-#### [MODIFY] [AppDatabase.kt](file:///Users/qwarts/AndroidStudioProjects/PennyPenguin/app/src/main/java/com/example/pennypenguin/data/local/AppDatabase.kt)
-- Register `WalletEntity` and increment version to `4`.
+### Dependency Injection
 
-#### [NEW] [WalletRepository.kt](file:///Users/qwarts/AndroidStudioProjects/PennyPenguin/domain/repository/WalletRepository.kt)
-- Define interface for wallet operations (Add, Delete, Get All).
+#### [MODIFY] [AuthModule.kt](file:///Users/qwarts/AndroidStudioProjects/PennyPenguin/app/src/main/java/com/example/pennypenguin/di/AuthModule.kt)
+- Add a `@Provides` method to provide an instance of `FirebaseAuth`.
+
+### Data Layer
+
+#### [MODIFY] [AuthRepository.kt](file:///Users/qwarts/AndroidStudioProjects/PennyPenguin/app/src/main/java/com/example/pennypenguin/domain/repository/AuthRepository.kt)
+- (Optional) Add a method to get the current user's display name or email if needed for the UI.
+
+#### [MODIFY] [AuthRepositoryImpl.kt](file:///Users/qwarts/AndroidStudioProjects/PennyPenguin/app/src/main/java/com/example/pennypenguin/data/repository/AuthRepositoryImpl.kt)
+- Inject `FirebaseAuth`.
+- Implement `isAuthenticated` as a `StateFlow` that reacts to `FirebaseAuth` state changes.
+- Implement `signInWithGoogle` using `GoogleAuthProvider.getCredential`.
+- Implement `signOut` using `Firebase.auth.signOut()`.
 
 ### Presentation Layer
 
-#### [MODIFY] [Screen.kt](file:///Users/qwarts/AndroidStudioProjects/PennyPenguin/app/src/main/java/com/example/pennypenguin/navigation/Screen.kt)
-- Add routes for `Wallets` management.
+#### [MODIFY] [AuthScreen.kt](file:///Users/qwarts/AndroidStudioProjects/PennyPenguin/app/src/main/java/com/example/pennypenguin/presentation/auth/AuthScreen.kt)
+- Inject `Context`.
+- Implement the `Credential Manager` flow:
+    1.  Create a `GetGoogleIdOption`.
+    2.  Build a `GetCredentialRequest`.
+    3.  Call `credentialManager.getCredential`.
+    4.  Pass the resulting `idToken` to `AuthViewModel`.
 
-#### [NEW] [WalletListScreen.kt](file:///Users/qwarts/AndroidStudioProjects/PennyPenguin/app/src/main/java/com/example/pennypenguin/presentation/wallets/WalletListScreen.kt)
-- A screen to view all wallets and their individual balances.
-
-#### [MODIFY] [DashboardScreen.kt](file:///Users/qwarts/AndroidStudioProjects/PennyPenguin/app/src/main/java/com/example/pennypenguin/presentation/dashboard/DashboardScreen.kt)
-- Update the balance card to show a summary of all wallets or allow switching between them.
-
-#### [MODIFY] [AddEditTransactionScreen.kt](file:///Users/qwarts/AndroidStudioProjects/PennyPenguin/app/src/main/java/com/example/pennypenguin/presentation/transactions/AddEditTransactionScreen.kt)
-- Add a wallet selector so users can choose which account the money is coming from or going to.
-
-#### [MODIFY] [ProfileScreen.kt](file:///Users/qwarts/AndroidStudioProjects/PennyPenguin/app/src/main/java/com/example/pennypenguin/presentation/profile/ProfileScreen.kt)
-- Add a "Wallets" menu item.
+#### [MODIFY] [AuthViewModel.kt](file:///Users/qwarts/AndroidStudioProjects/PennyPenguin/app/src/main/java/com/example/pennypenguin/presentation/auth/AuthViewModel.kt)
+- Update `onSignInResult` to handle the sign-in result from the repository and potentially expose loading or error states.
 
 ## Verification Plan
 
 ### Manual Verification
-1. Navigate to **Profile > Wallets**.
-2. Create two wallets: "Cash" and "Bank BCA".
-3. Navigate to **Add Transaction**.
-4. Create a transaction and select "Bank BCA".
-5. Verify the balance of "Bank BCA" updates, but "Cash" remains the same.
-6. Verify the **Dashboard** shows the total balance across all wallets.
+1.  Launch the app and reach the **Auth Screen**.
+2.  Tap **Sign in with Google**.
+3.  Ensure the Google account picker appears.
+4.  Select an account.
+5.  Verify successful redirection to the **Dashboard**.
+6.  Verify that the user remains logged in after restarting the app.
+7.  Verify that clicking "Sign Out" in the Profile works correctly.

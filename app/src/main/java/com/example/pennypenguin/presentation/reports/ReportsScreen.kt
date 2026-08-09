@@ -15,9 +15,12 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -115,6 +118,26 @@ fun ReportsScreen(
                     }
                 }
             }
+
+            item {
+                Text(
+                    text = "Spending Trend",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Start
+                )
+            }
+
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth().height(250.dp),
+                    shape = MaterialTheme.shapes.large,
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                ) {
+                    ExpenseTrendChart(data = state.dailyExpenseTrend)
+                }
+            }
             
             item {
                 Text(
@@ -199,6 +222,84 @@ fun CuteDonutChart(income: Double, expense: Double) {
                 Text(text = "Stats", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
                 Text(text = "🐟", fontSize = 32.sp)
             }
+        }
+    }
+}
+
+@Composable
+fun ExpenseTrendChart(data: List<ReportsViewModel.DailyTotal>) {
+    if (data.isEmpty()) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text("Not enough data for this month 🐧", style = MaterialTheme.typography.bodyMedium)
+        }
+        return
+    }
+
+    val maxAmount = remember(data) { data.maxOf { it.amount }.coerceAtLeast(1.0) }
+    val points = data.size
+    
+    Canvas(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 32.dp)) {
+        val width = size.width
+        val height = size.height
+        val spacing = width / (points.coerceAtLeast(2) - 1).toFloat()
+        
+        val path = Path()
+        val fillPath = Path()
+        
+        data.forEachIndexed { index, dailyTotal ->
+            val x = index * spacing
+            val y = height - (dailyTotal.amount / maxAmount * height).toFloat()
+            
+            if (index == 0) {
+                path.moveTo(x, y)
+                fillPath.moveTo(x, height)
+                fillPath.lineTo(x, y)
+            } else {
+                // Simplified cubic bezier for "wavy" effect
+                val prevX = (index - 1) * spacing
+                val prevY = height - (data[index - 1].amount / maxAmount * height).toFloat()
+                path.cubicTo(
+                    prevX + spacing / 2, prevY,
+                    x - spacing / 2, y,
+                    x, y
+                )
+                fillPath.cubicTo(
+                    prevX + spacing / 2, prevY,
+                    x - spacing / 2, y,
+                    x, y
+                )
+            }
+            
+            if (index == data.size - 1) {
+                fillPath.lineTo(x, height)
+                fillPath.close()
+            }
+        }
+
+        // Draw fill gradient
+        drawPath(
+            path = fillPath,
+            brush = Brush.verticalGradient(
+                colors = listOf(Color.Red.copy(alpha = 0.3f), Color.Transparent)
+            )
+        )
+
+        // Draw line
+        drawPath(
+            path = path,
+            color = Color.Red,
+            style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round)
+        )
+        
+        // Draw points
+        data.forEachIndexed { index, dailyTotal ->
+            val x = index * spacing
+            val y = height - (dailyTotal.amount / maxAmount * height).toFloat()
+            drawCircle(
+                color = Color.Red,
+                radius = 4.dp.toPx(),
+                center = Offset(x, y)
+            )
         }
     }
 }

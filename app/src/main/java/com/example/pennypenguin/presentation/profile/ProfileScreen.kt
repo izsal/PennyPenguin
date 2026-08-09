@@ -3,15 +3,22 @@ package com.example.pennypenguin.presentation.profile
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
+import com.example.pennypenguin.presentation.auth.AuthViewModel
 import com.example.pennypenguin.ui.LanguageViewModel
 import com.example.pennypenguin.ui.ThemeViewModel
 import com.example.pennypenguin.util.Localization
@@ -23,11 +30,13 @@ fun ProfileScreen(
     onCategoriesClick: () -> Unit,
     onWalletsClick: () -> Unit,
     themeViewModel: ThemeViewModel = hiltViewModel(),
-    languageViewModel: LanguageViewModel = hiltViewModel()
+    languageViewModel: LanguageViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
     val isDarkModePref by themeViewModel.isDarkMode.collectAsState()
     val isDarkMode = isDarkModePref ?: isSystemInDarkTheme()
     val lang by languageViewModel.language.collectAsState()
+    val user by authViewModel.currentUser.collectAsState()
 
     Scaffold(
         topBar = {
@@ -43,6 +52,57 @@ fun ProfileScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // User Info Header
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (user?.profilePictureUrl != null) {
+                        AsyncImage(
+                            model = user?.profilePictureUrl,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(64.dp)
+                                .clip(CircleShape),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Surface(
+                            modifier = Modifier.size(64.dp),
+                            shape = CircleShape,
+                            color = MaterialTheme.colorScheme.primaryContainer
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(
+                                    Icons.Default.Person,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(32.dp)
+                                )
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column {
+                        Text(
+                            text = user?.name ?: "User",
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                        Text(
+                            text = user?.email ?: "",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+
+            item {
+                HorizontalDivider()
+            }
+
             item {
                 Text(
                     text = Localization.getString("appearance", lang),
@@ -170,6 +230,23 @@ fun ProfileScreen(
                             Icon(Icons.Default.ChevronRight, contentDescription = null)
                         }
                     )
+                }
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    onClick = { authViewModel.signOut() },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        contentColor = MaterialTheme.colorScheme.onErrorContainer
+                    ),
+                    shape = MaterialTheme.shapes.medium
+                ) {
+                    Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Logout")
                 }
             }
         }

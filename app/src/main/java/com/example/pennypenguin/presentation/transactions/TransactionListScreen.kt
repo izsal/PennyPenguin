@@ -19,12 +19,38 @@ import com.example.pennypenguin.domain.model.Transaction
 import com.example.pennypenguin.domain.model.TransactionType
 import com.example.pennypenguin.util.CurrencyUtil
 
+import androidx.compose.runtime.*
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransactionListScreen(
     viewModel: TransactionListViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
+    var transactionToDelete by remember { mutableStateOf<Transaction?>(null) }
+
+    if (transactionToDelete != null) {
+        AlertDialog(
+            onDismissRequest = { transactionToDelete = null },
+            title = { Text("Delete Transaction") },
+            text = { Text("Are you sure you want to delete this transaction?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        transactionToDelete?.let { viewModel.deleteTransaction(it) }
+                        transactionToDelete = null
+                    }
+                ) {
+                    Text("Yes", color = Color.Red)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { transactionToDelete = null }) {
+                    Text("No")
+                }
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -54,7 +80,7 @@ fun TransactionListScreen(
                 items(state.transactions, key = { it.id }) { transaction ->
                     TransactionListItem(
                         transaction = transaction,
-                        onDelete = { viewModel.deleteTransaction(transaction) }
+                        onDelete = { transactionToDelete = transaction }
                     )
                 }
             }

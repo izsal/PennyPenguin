@@ -20,6 +20,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.pennypenguin.domain.model.BudgetWithSpent
 import com.example.pennypenguin.util.CurrencyUtil
 
+import androidx.compose.runtime.*
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BudgetScreen(
@@ -27,6 +29,30 @@ fun BudgetScreen(
     viewModel: BudgetViewModel = hiltViewModel()
 ) {
     val budgets by viewModel.budgets.collectAsState()
+    var budgetToDelete by remember { mutableStateOf<BudgetWithSpent?>(null) }
+
+    if (budgetToDelete != null) {
+        AlertDialog(
+            onDismissRequest = { budgetToDelete = null },
+            title = { Text("Delete Budget") },
+            text = { Text("Are you sure you want to delete this budget?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        budgetToDelete?.let { viewModel.deleteBudget(it) }
+                        budgetToDelete = null
+                    }
+                ) {
+                    Text("Yes", color = Color.Red)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { budgetToDelete = null }) {
+                    Text("No")
+                }
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -59,7 +85,7 @@ fun BudgetScreen(
                 items(budgets) { budget ->
                     BudgetItem(
                         budget = budget,
-                        onDelete = { viewModel.deleteBudget(budget) }
+                        onDelete = { budgetToDelete = budget }
                     )
                 }
             }

@@ -6,7 +6,7 @@ import androidx.room.TypeConverters
 
 @Database(
     entities = [TransactionEntity::class, CategoryEntity::class, BudgetEntity::class, WalletEntity::class],
-    version = 4,
+    version = 5,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

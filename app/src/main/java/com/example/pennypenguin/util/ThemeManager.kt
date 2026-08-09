@@ -16,6 +16,7 @@ class ThemeManager(private val context: Context) {
     companion object {
         val DARK_MODE_KEY = booleanPreferencesKey("dark_mode")
         val LANGUAGE_KEY = stringPreferencesKey("language")
+        val ONBOARDING_COMPLETED_KEY = booleanPreferencesKey("onboarding_completed")
     }
 
     val isDarkMode: Flow<Boolean?> = context.dataStore.data.map { preferences ->
@@ -24,6 +25,10 @@ class ThemeManager(private val context: Context) {
 
     val language: Flow<String> = context.dataStore.data.map { preferences ->
         preferences[LANGUAGE_KEY] ?: "in" // Default to Indonesian
+    }
+
+    val isOnboardingCompleted: Flow<Boolean> = context.dataStore.data.map { preferences ->
+        preferences[ONBOARDING_COMPLETED_KEY] ?: false
     }
 
     suspend fun setDarkMode(enabled: Boolean) {
@@ -35,6 +40,12 @@ class ThemeManager(private val context: Context) {
     suspend fun setLanguage(lang: String) {
         context.dataStore.edit { preferences ->
             preferences[LANGUAGE_KEY] = lang
+        }
+    }
+
+    suspend fun setOnboardingCompleted(completed: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[ONBOARDING_COMPLETED_KEY] = completed
         }
     }
 }

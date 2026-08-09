@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -15,12 +16,16 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
 import com.example.pennypenguin.domain.model.Category
 import com.example.pennypenguin.domain.model.TransactionType
 import com.example.pennypenguin.domain.model.Wallet
@@ -118,23 +123,71 @@ fun AddEditTransactionScreen(
                 
                 LazyColumn(
                     modifier = Modifier.heightIn(max = 400.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(wallets) { wallet ->
-                        ListItem(
-                            headlineContent = { Text(wallet.name) },
-                            supportingContent = { Text(com.example.pennypenguin.util.CurrencyUtil.formatRupiah(wallet.balance)) },
-                            leadingContent = { Text(text = wallet.icon, fontSize = 24.sp) },
-                            trailingContent = {
-                                if (wallet.id == selectedWallet?.id) {
-                                    Icon(Icons.Default.Check, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(80.dp)
+                                .clickable {
+                                    viewModel.onWalletChange(wallet)
+                                    showWalletPicker = false
+                                },
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Box(modifier = Modifier.fillMaxSize()) {
+                                if (wallet.backgroundImageUri != null) {
+                                    AsyncImage(
+                                        model = wallet.backgroundImageUri,
+                                        contentDescription = null,
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                    Surface(
+                                        color = Color.Black.copy(alpha = 0.4f),
+                                        modifier = Modifier.fillMaxSize()
+                                    ) {}
                                 }
-                            },
-                            modifier = Modifier.clickable {
-                                viewModel.onWalletChange(wallet)
-                                showWalletPicker = false
+                                Row(
+                                    modifier = Modifier
+                                        .padding(16.dp)
+                                        .fillMaxSize(),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Surface(
+                                        modifier = Modifier.size(40.dp),
+                                        shape = RoundedCornerShape(8.dp),
+                                        color = if (wallet.backgroundImageUri != null) Color.White.copy(alpha = 0.8f) else MaterialTheme.colorScheme.primaryContainer
+                                    ) {
+                                        Box(contentAlignment = Alignment.Center) {
+                                            Text(text = wallet.icon, fontSize = 20.sp)
+                                        }
+                                    }
+                                    Spacer(modifier = Modifier.width(16.dp))
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = wallet.name,
+                                            style = MaterialTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            color = if (wallet.backgroundImageUri != null) Color.White else MaterialTheme.colorScheme.onSurface
+                                        )
+                                        Text(
+                                            text = com.example.pennypenguin.util.CurrencyUtil.formatRupiah(wallet.balance),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = if (wallet.backgroundImageUri != null) Color.White.copy(alpha = 0.8f) else MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                    if (wallet.id == selectedWallet?.id) {
+                                        Icon(
+                                            Icons.Default.Check,
+                                            contentDescription = null,
+                                            tint = if (wallet.backgroundImageUri != null) Color.White else MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                }
                             }
-                        )
+                        }
                     }
                 }
             }

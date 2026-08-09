@@ -17,6 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.runtime.*
+import com.example.pennypenguin.domain.model.Category
 import com.example.pennypenguin.domain.model.TransactionType
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -28,6 +30,30 @@ fun CategoryListScreen(
     viewModel: CategoryListViewModel = hiltViewModel()
 ) {
     val categories by viewModel.categories.collectAsState()
+    var categoryToDelete by remember { mutableStateOf<Category?>(null) }
+
+    if (categoryToDelete != null) {
+        AlertDialog(
+            onDismissRequest = { categoryToDelete = null },
+            title = { Text("Delete Category") },
+            text = { Text("Are you sure you want to delete this category? Transactions using this category will be updated to 'Other'.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        categoryToDelete?.let { viewModel.deleteCategory(it) }
+                        categoryToDelete = null
+                    }
+                ) {
+                    Text("Yes", color = Color.Red)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { categoryToDelete = null }) {
+                    Text("No")
+                }
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -71,7 +97,7 @@ fun CategoryListScreen(
                                 IconButton(onClick = { onEditCategoryClick(category.id) }) {
                                     Icon(Icons.Default.Edit, contentDescription = "Edit")
                                 }
-                                IconButton(onClick = { viewModel.deleteCategory(category) }) {
+                                IconButton(onClick = { categoryToDelete = category }) {
                                     Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color.Red)
                                 }
                             }

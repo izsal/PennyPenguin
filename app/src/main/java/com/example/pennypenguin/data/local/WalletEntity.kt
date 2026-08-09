@@ -9,8 +9,9 @@ data class WalletEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val name: String,
     val balance: Double,
-    val icon: String
+    val icon: String,
+    val backgroundImageUri: String? = null
 )
 
-fun WalletEntity.toDomain() = Wallet(id, name, balance, icon)
-fun Wallet.toEntity() = WalletEntity(id, name, balance, icon)
+fun WalletEntity.toDomain() = Wallet(id, name, balance, icon, backgroundImageUri)
+fun Wallet.toEntity() = WalletEntity(id, name, balance, icon, backgroundImageUri)

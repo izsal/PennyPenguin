@@ -1,13 +1,6 @@
-- `[x]` Data Layer: Create `WalletEntity` and `WalletDao`
-- `[x]` Data Layer: Update `TransactionEntity` with `walletId` and `walletName`
-- `[x]` Data Layer: Update `AppDatabase` to version 4 and include `WalletDao`
-- `[x]` Domain Layer: Create `Wallet` model and `WalletRepository` interface
-- `[x]` Data Layer: Implement `WalletRepositoryImpl`
-- `[x]` DI: Update `DatabaseModule` and `RepositoryModule` for Wallets
-- `[x]` Navigation: Add `Wallets` and `AddEditWallet` routes to `Screen.kt`
-- `[x]` Presentation: Implement `WalletListScreen` and `WalletViewModel`
-- `[x]` Presentation: Implement `AddEditWalletScreen` and `AddEditWalletViewModel`
-- `[x]` Presentation: Update `AddEditTransactionViewModel` and `AddEditTransactionScreen` to support wallet selection
-- `[x]` Presentation: Update `DashboardScreen` and `DashboardViewModel` to handle multiple wallets
-- `[x]` Presentation: Add "Wallets" menu to `ProfileScreen.kt`
-- `[x]` Presentation: Update `MainScreen.kt` with new routes
+- `[x]` Configuration: Add Credential Manager dependencies to `libs.versions.toml` and `build.gradle.kts`
+- `[x]` DI: Provide `FirebaseAuth` in `AuthModule.kt`
+- `[x]` Data Layer: Update `AuthRepositoryImpl` with Firebase logic
+- `[x]` Presentation: Implement Credential Manager flow in `AuthScreen.kt`
+- `[x]` Presentation: Update `AuthViewModel` to handle sign-in results
+- `[x]` Verification: Test the full Google Sign-In flow

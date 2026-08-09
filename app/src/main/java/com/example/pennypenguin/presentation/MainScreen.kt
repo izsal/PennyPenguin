@@ -20,6 +20,8 @@ import androidx.navigation.NavType
 import com.example.pennypenguin.navigation.Screen
 import com.example.pennypenguin.presentation.auth.AuthScreen
 import com.example.pennypenguin.presentation.auth.AuthViewModel
+import com.example.pennypenguin.presentation.onboarding.OnboardingScreen
+import com.example.pennypenguin.presentation.onboarding.OnboardingViewModel
 import com.example.pennypenguin.presentation.budget.AddEditBudgetScreen
 import com.example.pennypenguin.presentation.budget.BudgetScreen
 import com.example.pennypenguin.presentation.categories.AddCategoryScreen
@@ -39,9 +41,11 @@ import com.example.pennypenguin.util.Localization
 @Composable
 fun MainScreen(
     authViewModel: AuthViewModel = hiltViewModel(),
-    languageViewModel: LanguageViewModel = hiltViewModel()
+    languageViewModel: LanguageViewModel = hiltViewModel(),
+    onboardingViewModel: OnboardingViewModel = hiltViewModel()
 ) {
     val isAuthenticated by authViewModel.isAuthenticated.collectAsState()
+    val isOnboardingCompleted by onboardingViewModel.isOnboardingCompleted.collectAsState()
     val lang by languageViewModel.language.collectAsState()
     val navController = rememberNavController()
 
@@ -49,15 +53,24 @@ fun MainScreen(
     val currentDestination = navBackStackEntry?.destination
     val currentRoute = currentDestination?.route
 
-    LaunchedEffect(isAuthenticated) {
+    LaunchedEffect(isAuthenticated, isOnboardingCompleted) {
+        if (!isOnboardingCompleted) {
+            if (currentRoute != Screen.Onboarding.route) {
+                navController.navigate(Screen.Onboarding.route) {
+                    popUpTo(0) { inclusive = true }
+                }
+            }
+            return@LaunchedEffect
+        }
+
         if (isAuthenticated) {
-            if (currentRoute == Screen.Auth.route) {
+            if (currentRoute == Screen.Auth.route || currentRoute == Screen.Onboarding.route) {
                 navController.navigate(Screen.Dashboard.route) {
-                    popUpTo(Screen.Auth.route) { inclusive = true }
+                    popUpTo(0) { inclusive = true }
                 }
             }
         } else {
-            if (currentRoute != Screen.Auth.route) {
+            if (currentRoute != Screen.Auth.route && currentRoute != Screen.Onboarding.route) {
                 navController.navigate(Screen.Auth.route) {
                     popUpTo(0) { inclusive = true }
                 }
@@ -108,15 +121,27 @@ fun MainScreen(
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Screen.Auth.route,
+            startDestination = if (!isOnboardingCompleted) Screen.Onboarding.route else Screen.Auth.route,
             modifier = Modifier.padding(innerPadding)
         ) {
+            composable(Screen.Onboarding.route) {
+                OnboardingScreen(
+                    onOnboardingComplete = {
+                        navController.navigate(Screen.Auth.route) {
+                            popUpTo(Screen.Onboarding.route) { inclusive = true }
+                        }
+                    }
+                )
+            }
             composable(Screen.Auth.route) {
-                AuthScreen(onSignInClick = { authViewModel.onSignInResult("placeholder_token") })
+                AuthScreen()
             }
             composable(Screen.Dashboard.route) {
                 DashboardScreen(
-                    onSeeAllClick = { navController.navigate(Screen.Transactions.route) }
+                    onSeeAllClick = { navController.navigate(Screen.Transactions.route) },
+                    onWalletsClick = { navController.navigate(Screen.Wallets.route) },
+                    onBudgetClick = { navController.navigate(Screen.Budget.route) },
+                    onReportsClick = { navController.navigate(Screen.Reports.route) }
                 )
             }
             composable(Screen.Transactions.route) {

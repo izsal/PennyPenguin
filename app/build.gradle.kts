@@ -76,6 +76,9 @@ dependencies {
     // Lottie
     implementation(libs.lottie.compose)
     
+    // Coil
+    implementation(libs.coil.compose)
+    
     // DataStore
     implementation(libs.androidx.datastore.preferences)
     
@@ -84,6 +87,11 @@ dependencies {
 
     // Splash Screen
     implementation(libs.androidx.core.splashscreen)
+
+    // Credentials & Google ID
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
 
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
