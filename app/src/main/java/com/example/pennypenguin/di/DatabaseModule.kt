@@ -3,8 +3,10 @@ package com.example.pennypenguin.di
 import android.content.Context
 import androidx.room.Room
 import com.example.pennypenguin.data.local.AppDatabase
+import com.example.pennypenguin.data.local.BudgetDao
 import com.example.pennypenguin.data.local.CategoryDao
 import com.example.pennypenguin.data.local.TransactionDao
+import com.example.pennypenguin.data.local.WalletDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -35,5 +37,15 @@ object DatabaseModule {
     @Provides
     fun provideCategoryDao(database: AppDatabase): CategoryDao {
         return database.categoryDao
+    }
+
+    @Provides
+    fun provideBudgetDao(database: AppDatabase): BudgetDao {
+        return database.budgetDao
+    }
+
+    @Provides
+    fun provideWalletDao(database: AppDatabase): WalletDao {
+        return database.walletDao
     }
 }

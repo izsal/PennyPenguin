@@ -8,6 +8,8 @@ data class Transaction(
     val categoryId: String,
     val categoryName: String,
     val categoryIcon: String,
+    val walletId: Int,
+    val walletName: String,
     val type: TransactionType,
     val note: String = "",
     val date: LocalDateTime = LocalDateTime.now()

@@ -1,32 +1,51 @@
-# Implementation Plan - Edit and Delete Categories
+# Implementation Plan - Multiple Wallets (Dompet Ganda)
 
-The goal is to complete the CRUD operations for custom categories by adding an edit feature and ensuring delete functionality is easily accessible.
+The goal is to allow users to manage money across multiple accounts (e.g., Cash, Bank, E-Wallet). This is a core premium feature that provides better financial clarity.
+
+## User Review Required
+
+> [!IMPORTANT]
+> This change requires a database migration to version 4. I will enable destructive migration, which will reset your data once more to ensure the new wallet relationships are correctly established.
 
 ## Proposed Changes
+
+### Data & Domain Layer
+
+#### [NEW] [WalletEntity.kt](file:///Users/qwarts/AndroidStudioProjects/PennyPenguin/app/src/main/java/com/example/pennypenguin/data/local/WalletEntity.kt)
+- Define Room entity for `Wallet` (id, name, balance, icon).
+
+#### [MODIFY] [TransactionEntity.kt](file:///Users/qwarts/AndroidStudioProjects/PennyPenguin/app/src/main/java/com/example/pennypenguin/data/local/TransactionEntity.kt)
+- Add `walletId` and `walletName` to link transactions to a specific wallet.
+
+#### [MODIFY] [AppDatabase.kt](file:///Users/qwarts/AndroidStudioProjects/PennyPenguin/app/src/main/java/com/example/pennypenguin/data/local/AppDatabase.kt)
+- Register `WalletEntity` and increment version to `4`.
+
+#### [NEW] [WalletRepository.kt](file:///Users/qwarts/AndroidStudioProjects/PennyPenguin/domain/repository/WalletRepository.kt)
+- Define interface for wallet operations (Add, Delete, Get All).
 
 ### Presentation Layer
 
 #### [MODIFY] [Screen.kt](file:///Users/qwarts/AndroidStudioProjects/PennyPenguin/app/src/main/java/com/example/pennypenguin/navigation/Screen.kt)
-- Update `AddCategory` route to accept an optional `categoryId` parameter: `add_category?categoryId={categoryId}`.
+- Add routes for `Wallets` management.
 
-#### [MODIFY] [MainScreen.kt](file:///Users/qwarts/AndroidStudioProjects/PennyPenguin/app/src/main/java/com/example/pennypenguin/presentation/MainScreen.kt)
-- Update the `composable` for `AddCategory` to retrieve the `categoryId` argument and pass it to the screen/ViewModel.
+#### [NEW] [WalletListScreen.kt](file:///Users/qwarts/AndroidStudioProjects/PennyPenguin/app/src/main/java/com/example/pennypenguin/presentation/wallets/WalletListScreen.kt)
+- A screen to view all wallets and their individual balances.
 
-#### [MODIFY] [AddCategoryViewModel.kt](file:///Users/qwarts/AndroidStudioProjects/PennyPenguin/app/src/main/java/com/example/pennypenguin/presentation/categories/AddCategoryViewModel.kt)
-- Add logic to load an existing category if `categoryId` is provided.
-- Update `saveCategory` to update the existing category instead of always creating a new one (using the same ID).
+#### [MODIFY] [DashboardScreen.kt](file:///Users/qwarts/AndroidStudioProjects/PennyPenguin/app/src/main/java/com/example/pennypenguin/presentation/dashboard/DashboardScreen.kt)
+- Update the balance card to show a summary of all wallets or allow switching between them.
 
-#### [MODIFY] [CategoryListScreen.kt](file:///Users/qwarts/AndroidStudioProjects/PennyPenguin/app/src/main/java/com/example/pennypenguin/presentation/categories/CategoryListScreen.kt)
-- Add an "Edit" icon button next to the delete button for custom categories.
-- Ensure clicking the edit button navigates to `AddCategory` with the correct ID.
+#### [MODIFY] [AddEditTransactionScreen.kt](file:///Users/qwarts/AndroidStudioProjects/PennyPenguin/app/src/main/java/com/example/pennypenguin/presentation/transactions/AddEditTransactionScreen.kt)
+- Add a wallet selector so users can choose which account the money is coming from or going to.
+
+#### [MODIFY] [ProfileScreen.kt](file:///Users/qwarts/AndroidStudioProjects/PennyPenguin/app/src/main/java/com/example/pennypenguin/presentation/profile/ProfileScreen.kt)
+- Add a "Wallets" menu item.
 
 ## Verification Plan
 
 ### Manual Verification
-1. Navigate to **Profile > Categories**.
-2. Create a custom category.
-3. Click the **Edit** icon on the new category.
-4. Change the name/icon and save.
-5. Verify the category is updated in the list.
-6. Click the **Delete** icon and verify the category is removed.
-7. Go to the transaction screen and verify the changes are reflected in the picker.
+1. Navigate to **Profile > Wallets**.
+2. Create two wallets: "Cash" and "Bank BCA".
+3. Navigate to **Add Transaction**.
+4. Create a transaction and select "Bank BCA".
+5. Verify the balance of "Bank BCA" updates, but "Cash" remains the same.
+6. Verify the **Dashboard** shows the total balance across all wallets.

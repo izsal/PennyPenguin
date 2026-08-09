@@ -96,12 +96,20 @@ fun TransactionListItem(
                     text = transaction.categoryName,
                     style = MaterialTheme.typography.titleMedium
                 )
-                if (transaction.note.isNotBlank()) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = transaction.note,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                        text = transaction.walletName,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary
                     )
+                    if (transaction.note.isNotBlank()) {
+                        Text(
+                            text = " • ${transaction.note}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                            maxLines = 1
+                        )
+                    }
                 }
             }
             Column(horizontalAlignment = Alignment.End) {

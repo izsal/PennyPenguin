@@ -1,7 +1,9 @@
 package com.example.pennypenguin.presentation.dashboard
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -45,6 +47,23 @@ fun DashboardScreen(
             }
             item {
                 BalanceCard(state.balance, state.monthlyIncome, state.monthlyExpense, lang)
+            }
+            if (state.wallets.isNotEmpty()) {
+                item {
+                    Text(
+                        text = "My Wallets",
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                    LazyRow(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(state.wallets) { wallet ->
+                            WalletSummaryCard(wallet)
+                        }
+                    }
+                }
             }
             item {
                 Row(
@@ -133,6 +152,27 @@ fun SummaryItem(label: String, amount: Double, color: Color) {
 }
 
 @Composable
+fun WalletSummaryCard(wallet: com.example.pennypenguin.domain.model.Wallet) {
+    Card(
+        modifier = Modifier.width(160.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(text = wallet.icon, fontSize = 24.sp)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = wallet.name, style = MaterialTheme.typography.titleSmall, maxLines = 1)
+            Text(
+                text = CurrencyUtil.formatRupiah(wallet.balance),
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+    }
+}
+
+@Composable
 fun TransactionItem(transaction: Transaction) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -159,7 +199,13 @@ fun TransactionItem(transaction: Transaction) {
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(text = transaction.categoryName, style = MaterialTheme.typography.titleLarge, fontSize = 16.sp)
-                Text(text = transaction.note, style = MaterialTheme.typography.bodyLarge, fontSize = 12.sp, color = Color.Gray)
+                Text(
+                    text = "${transaction.walletName}${if (transaction.note.isNotBlank()) " • ${transaction.note}" else ""}",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontSize = 12.sp,
+                    color = Color.Gray,
+                    maxLines = 1
+                )
             }
             Text(
                 text = "${if (transaction.type == TransactionType.INCOME) "+" else "-"}${CurrencyUtil.formatRupiah(transaction.amount)}",

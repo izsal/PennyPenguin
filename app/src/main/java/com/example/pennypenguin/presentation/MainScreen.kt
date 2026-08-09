@@ -20,6 +20,8 @@ import androidx.navigation.NavType
 import com.example.pennypenguin.navigation.Screen
 import com.example.pennypenguin.presentation.auth.AuthScreen
 import com.example.pennypenguin.presentation.auth.AuthViewModel
+import com.example.pennypenguin.presentation.budget.AddEditBudgetScreen
+import com.example.pennypenguin.presentation.budget.BudgetScreen
 import com.example.pennypenguin.presentation.categories.AddCategoryScreen
 import com.example.pennypenguin.presentation.categories.CategoryListScreen
 import com.example.pennypenguin.presentation.dashboard.DashboardScreen
@@ -29,6 +31,8 @@ import com.example.pennypenguin.presentation.reports.CategoryReportsScreen
 import com.example.pennypenguin.presentation.reports.ReportsScreen
 import com.example.pennypenguin.presentation.transactions.AddEditTransactionScreen
 import com.example.pennypenguin.presentation.transactions.TransactionListScreen
+import com.example.pennypenguin.presentation.wallets.AddEditWalletScreen
+import com.example.pennypenguin.presentation.wallets.WalletListScreen
 import com.example.pennypenguin.ui.LanguageViewModel
 import com.example.pennypenguin.util.Localization
 
@@ -118,6 +122,16 @@ fun MainScreen(
             composable(Screen.Transactions.route) {
                 TransactionListScreen()
             }
+            composable(Screen.Budget.route) {
+                BudgetScreen(
+                    onAddBudgetClick = { navController.navigate(Screen.AddEditBudget.route) }
+                )
+            }
+            composable(Screen.AddEditBudget.route) {
+                AddEditBudgetScreen(
+                    onPopBackStack = { navController.popBackStack() }
+                )
+            }
             composable(Screen.Reports.route) {
                 ReportsScreen(
                     onSeeCategoryReportsClick = { navController.navigate(Screen.CategoryReports.route) }
@@ -131,7 +145,29 @@ fun MainScreen(
             composable(Screen.Profile.route) {
                 ProfileScreen(
                     onPrivacyPolicyClick = { navController.navigate(Screen.PrivacyPolicy.route) },
-                    onCategoriesClick = { navController.navigate(Screen.Categories.route) }
+                    onCategoriesClick = { navController.navigate(Screen.Categories.route) },
+                    onWalletsClick = { navController.navigate(Screen.Wallets.route) }
+                )
+            }
+            composable(Screen.Wallets.route) {
+                WalletListScreen(
+                    onBackClick = { navController.popBackStack() },
+                    onAddWalletClick = { navController.navigate("add_edit_wallet") },
+                    onEditWalletClick = { id -> navController.navigate("add_edit_wallet?walletId=$id") }
+                )
+            }
+            composable(
+                route = Screen.AddEditWallet.route,
+                arguments = listOf(
+                    navArgument("walletId") {
+                        type = NavType.StringType
+                        nullable = true
+                        defaultValue = null
+                    }
+                )
+            ) {
+                AddEditWalletScreen(
+                    onPopBackStack = { navController.popBackStack() }
                 )
             }
             composable(Screen.Categories.route) {

@@ -16,6 +16,7 @@ playServicesAuth = "21.6.0"
 lottie = "6.7.1"
 datastore = "1.2.1"
 billing = "9.1.0"
+splashscreen = "1.0.1"
 ksp = "2.2.10-2.0.2"
 google-services = "4.5.0"
 
@@ -61,6 +62,9 @@ androidx-datastore-preferences = { group = "androidx.datastore", name = "datasto
 
 # Billing
 billing-ktx = { group = "com.android.billingclient", name = "billing-ktx", version.ref = "billing" }
+
+# Splash Screen
+androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "splashscreen" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

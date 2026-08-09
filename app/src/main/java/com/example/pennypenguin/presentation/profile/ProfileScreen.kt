@@ -21,6 +21,7 @@ import com.example.pennypenguin.util.Localization
 fun ProfileScreen(
     onPrivacyPolicyClick: () -> Unit,
     onCategoriesClick: () -> Unit,
+    onWalletsClick: () -> Unit,
     themeViewModel: ThemeViewModel = hiltViewModel(),
     languageViewModel: LanguageViewModel = hiltViewModel()
 ) {
@@ -116,6 +117,24 @@ fun ProfileScreen(
                         headlineContent = { Text("Categories") },
                         leadingContent = {
                             Icon(Icons.Default.Category, contentDescription = null)
+                        },
+                        trailingContent = {
+                            Icon(Icons.Default.ChevronRight, contentDescription = null)
+                        }
+                    )
+                }
+            }
+
+            item {
+                Surface(
+                    onClick = onWalletsClick,
+                    shape = MaterialTheme.shapes.medium,
+                    color = MaterialTheme.colorScheme.surface
+                ) {
+                    ListItem(
+                        headlineContent = { Text("Wallets") },
+                        leadingContent = {
+                            Icon(Icons.Default.AccountBalanceWallet, contentDescription = null)
                         },
                         trailingContent = {
                             Icon(Icons.Default.ChevronRight, contentDescription = null)

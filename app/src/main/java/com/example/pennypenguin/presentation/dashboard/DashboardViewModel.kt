@@ -2,22 +2,18 @@ package com.example.pennypenguin.presentation.dashboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.pennypenguin.domain.repository.WalletRepository
 import com.example.pennypenguin.domain.usecase.GetBalanceUseCase
 import com.example.pennypenguin.domain.usecase.GetTransactionsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
     private val getBalanceUseCase: GetBalanceUseCase,
-    private val getTransactionsUseCase: GetTransactionsUseCase
+    private val getTransactionsUseCase: GetTransactionsUseCase,
+    private val walletRepository: WalletRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DashboardState())
@@ -32,12 +28,14 @@ class DashboardViewModel @Inject constructor(
         
         combine(
             getBalanceUseCase(),
-            getTransactionsUseCase()
-        ) { balance, transactions ->
+            getTransactionsUseCase(),
+            walletRepository.getAllWallets()
+        ) { balance, transactions, wallets ->
             _state.update { 
                 it.copy(
                     balance = balance,
                     recentTransactions = transactions.take(5),
+                    wallets = wallets,
                     isLoading = false
                 )
             }

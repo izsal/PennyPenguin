@@ -13,6 +13,8 @@ data class TransactionEntity(
     val categoryId: String,
     val categoryName: String,
     val categoryIcon: String,
+    val walletId: Int,
+    val walletName: String,
     val type: TransactionType,
     val note: String,
     val date: LocalDateTime
@@ -25,6 +27,8 @@ fun TransactionEntity.toDomain(): Transaction {
         categoryId = categoryId,
         categoryName = categoryName,
         categoryIcon = categoryIcon,
+        walletId = walletId,
+        walletName = walletName,
         type = type,
         note = note,
         date = date
@@ -38,6 +42,8 @@ fun Transaction.toEntity(): TransactionEntity {
         categoryId = categoryId,
         categoryName = categoryName,
         categoryIcon = categoryIcon,
+        walletId = walletId,
+        walletName = walletName,
         type = type,
         note = note,
         date = date

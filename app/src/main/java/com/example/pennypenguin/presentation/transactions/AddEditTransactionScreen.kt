@@ -2,9 +2,11 @@ package com.example.pennypenguin.presentation.transactions
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -21,6 +23,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.pennypenguin.domain.model.Category
 import com.example.pennypenguin.domain.model.TransactionType
+import com.example.pennypenguin.domain.model.Wallet
+import com.example.pennypenguin.util.IDRVisualTransformation
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,9 +38,13 @@ fun AddEditTransactionScreen(
     val type by viewModel.type.collectAsState()
     val category by viewModel.category.collectAsState()
     val categories by viewModel.categories.collectAsState()
+    val wallets by viewModel.wallets.collectAsState()
+    val selectedWallet by viewModel.selectedWallet.collectAsState()
 
     var showCategoryPicker by remember { mutableStateOf(false) }
+    var showWalletPicker by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
+    val walletSheetState = rememberModalBottomSheetState()
 
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->
@@ -90,6 +98,49 @@ fun AddEditTransactionScreen(
         }
     }
 
+    if (showWalletPicker) {
+        ModalBottomSheet(
+            onDismissRequest = { showWalletPicker = false },
+            sheetState = walletSheetState
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .navigationBarsPadding()
+            ) {
+                Text(
+                    text = "Select Wallet",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+                
+                LazyColumn(
+                    modifier = Modifier.heightIn(max = 400.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(wallets) { wallet ->
+                        ListItem(
+                            headlineContent = { Text(wallet.name) },
+                            supportingContent = { Text(com.example.pennypenguin.util.CurrencyUtil.formatRupiah(wallet.balance)) },
+                            leadingContent = { Text(text = wallet.icon, fontSize = 24.sp) },
+                            trailingContent = {
+                                if (wallet.id == selectedWallet?.id) {
+                                    Icon(Icons.Default.Check, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                                }
+                            },
+                            modifier = Modifier.clickable {
+                                viewModel.onWalletChange(wallet)
+                                showWalletPicker = false
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -136,8 +187,9 @@ fun AddEditTransactionScreen(
                 onValueChange = viewModel::onAmountChange,
                 label = { Text("Amount") },
                 modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                prefix = { Text("Rp") }
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                prefix = { Text("Rp ") },
+                visualTransformation = IDRVisualTransformation()
             )
 
             OutlinedTextField(
@@ -147,13 +199,27 @@ fun AddEditTransactionScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Text("Category", style = MaterialTheme.typography.titleLarge)
-            
-            AssistChip(
-                onClick = { showCategoryPicker = true },
-                label = { Text(category.name) },
-                leadingIcon = { Text(category.icon) }
-            )
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("Wallet", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    AssistChip(
+                        onClick = { showWalletPicker = true },
+                        label = { Text(selectedWallet?.name ?: "Select Wallet") },
+                        leadingIcon = { Text(selectedWallet?.icon ?: "💰") }
+                    )
+                }
+                
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("Category", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    AssistChip(
+                        onClick = { showCategoryPicker = true },
+                        label = { Text(category.name) },
+                        leadingIcon = { Text(category.icon) }
+                    )
+                }
+            }
         }
     }
 }

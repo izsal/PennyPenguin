@@ -1,12 +1,13 @@
-- `[x]` Data Layer: Increment `AppDatabase` version to 2
-- `[x]` Data Layer: Enable `fallbackToDestructiveMigration` in `DatabaseModule`
-- `[x]` Navigation: Add `Categories` route to `Screen.kt`
-- `[x]` Presentation: Add "Category" menu to `ProfileScreen.kt`
-- `[x]` Presentation: Implement `CategoryListScreen` and `CategoryListViewModel`
+- `[x]` Data Layer: Create `WalletEntity` and `WalletDao`
+- `[x]` Data Layer: Update `TransactionEntity` with `walletId` and `walletName`
+- `[x]` Data Layer: Update `AppDatabase` to version 4 and include `WalletDao`
+- `[x]` Domain Layer: Create `Wallet` model and `WalletRepository` interface
+- `[x]` Data Layer: Implement `WalletRepositoryImpl`
+- `[x]` DI: Update `DatabaseModule` and `RepositoryModule` for Wallets
+- `[x]` Navigation: Add `Wallets` and `AddEditWallet` routes to `Screen.kt`
+- `[x]` Presentation: Implement `WalletListScreen` and `WalletViewModel`
+- `[x]` Presentation: Implement `AddEditWalletScreen` and `AddEditWalletViewModel`
+- `[x]` Presentation: Update `AddEditTransactionViewModel` and `AddEditTransactionScreen` to support wallet selection
+- `[x]` Presentation: Update `DashboardScreen` and `DashboardViewModel` to handle multiple wallets
+- `[x]` Presentation: Add "Wallets" menu to `ProfileScreen.kt`
 - `[x]` Presentation: Update `MainScreen.kt` with new routes
-- `[x]` Presentation: Remove "Add Custom" shortcut from `AddEditTransactionScreen`
-- `[x]` Presentation: Implement Edit and Delete for Categories
-    - `[x]` Update `Screen.kt` for navigation parameters
-    - `[x]` Update `MainScreen.kt` to pass `categoryId` to `AddCategoryScreen`
-    - `[x]` Update `AddCategoryViewModel` to support editing
-    - `[x]` Add Edit button to `CategoryListScreen`
